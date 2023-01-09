@@ -1,8 +1,7 @@
-import moviepy.editor as mpe
+import modified_libs.editor as mpe
 from data import *
 from pydub import AudioSegment
 from proglog import ProgressBarLogger
-import asyncio
 
 
 class MyBarLogger(ProgressBarLogger):
@@ -53,21 +52,3 @@ def render() -> None:
         clips: list = [general_clip.subclip(x[0] / 1000.0, x[1] / 1000.0) for x in sub_arrays]
         audio = mpe.concatenate_audioclips(clips)
         audio.write_audiofile(save_path, logger=MyBarLogger())
-
-
-# TODO: Delete this
-########################################
-def include_test() -> None:
-    Store.set_input_file_path("D:\\Experiments\\untitled.mp4")
-    Store.set_output_file_path("D:\\Experiments\\mp4er")
-    Store.format = ".mp4"
-    Store.set_pydub_segment(AudioSegment.from_file("D:\\Experiments\\untitled.mp4"))
-
-    max1 = [x.max for x in Store.get_pydub_segment()]
-    Store.min_volume = max(max1) / 2
-    render()
-
-
-if __name__ == '__main__':
-    include_test()
-#######################################

@@ -1,21 +1,26 @@
+import sys
 import time
+
+import subprocess
+import threading
 
 from tkinter import filedialog, Tk
 import pygame
+import pygame_gui as pygui
+
 import backend
 from data import *
-import pygame as pg
-import pygame_gui as pygui
 from pygame_widgets import Widgets, relative_rect
-import subprocess
-import threading
-from typing import Union
 
 
 def init():
-    pg.init()
-    pg.display.set_caption('Silence Cutter')
-    window = pg.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), vsync=1)
+    pygame.init()
+    pygame.display.set_caption('Silence Cutter')
+
+    icon_image = pygame.image.load("favicon.ico")
+    pygame.display.set_icon(icon_image)
+
+    window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), vsync=1)
     manager = pygui.UIManager(window.get_size(), 'theme.json')
 
     return window, manager
@@ -93,9 +98,10 @@ def main():
     blame_bool: bool = False
     while True:
         time.sleep(1 / FPS)
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                quit()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
             if event.type == pygui.UI_BUTTON_PRESSED:
                 if event.ui_element == render_button:
                     progress_chunk_bar = Widgets.progress_chunk_bar()
@@ -141,7 +147,7 @@ def main():
             if progress_t_bar != Store.get_progress()["t"]:
                 progress_t_bar.set_current_progress(Store.get_progress()["t"])
 
-        window.fill(color=pg.Color('#323436'))
+        window.fill(color=pygame.Color('#323436'))
         pygame.draw.rect(window, (59, 52, 54), pygame.Rect(0, 0, 800, 50))
 
         if Store.volume_range is not volume_range_last:
@@ -180,7 +186,7 @@ def main():
         ))
         manager.update(1 / FPS)
         manager.draw_ui(window)
-        pg.display.update()
+        pygame.display.update()
 
 
 if __name__ == '__main__':

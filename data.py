@@ -29,8 +29,7 @@ class Store:
 
     @staticmethod
     def set_progress(bar, percentage):
-        if Store._progress[bar] + 10 > percentage:
-            Store._progress[bar] = percentage
+        Store._progress[bar] = percentage
 
     @staticmethod
     def get_pydub_segment() -> AudioSegment:

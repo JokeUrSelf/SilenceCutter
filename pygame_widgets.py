@@ -1,6 +1,5 @@
-import pygame
 import pygame_gui as pygui
-import pygame as pg
+import pygame
 from modified_libs.ui_vertical_slider import UIVerticalScrollBar
 
 
@@ -35,7 +34,7 @@ class Widgets:
     def error_label() -> pygui.elements.UILabel:
         return pygui.elements.UILabel(
             text="",
-            relative_rect=pg.Rect(15, 0, 700, 50)
+            relative_rect=pygame.Rect(15, 0, 700, 50)
         )
 
     @staticmethod
@@ -98,7 +97,7 @@ class Widgets:
     @staticmethod
     def render_button() -> pygui.elements.UIButton:
         return pygui.elements.UIButton(
-            relative_rect=pg.Rect(15, 500, 80, 30),
+            relative_rect=pygame.Rect(15, 500, 80, 30),
             text='render',
         )
 
