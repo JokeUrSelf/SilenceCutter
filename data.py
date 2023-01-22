@@ -15,7 +15,7 @@ class Store:
     min_volume: float = .0
     max_possible_volume: float = .0
     format: str = ".mp3"
-    output_file_name: str
+    output_file_name: str = "untitled"
 
     _input_file_path: Union[str, None] = None
     _output_directory_path: Union[str, None] = None
@@ -37,6 +37,7 @@ class Store:
 
     @staticmethod
     def set_pydub_segment(value: AudioSegment) -> None:
+
         val = [x.max for x in value]
         Store.volume_range = val[:-50:len(val) // 50]
         Store._pydub_audio_segment = value
@@ -91,7 +92,17 @@ class Store:
             Store.error_list_add_item(err_mess)
             return
 
-        audio_seg = AudioSegment.from_file(value)
+        hint: str = "hint: adjust a slider to lower values to eliminate segments with low volume levels."
+
+        if hint not in Store.error_list:
+            Store.error_list_add_item(hint)
+
+        try:
+            audio_seg:AudioSegment = AudioSegment.from_file(value)
+        except:
+            Store.error_list_add_item("Error: Couldn't load the file, try checking file format")
+            return
+
         if len(audio_seg) < 50:
             Store.error_list_add_item("Error: the file is either too short or corrupted")
             return

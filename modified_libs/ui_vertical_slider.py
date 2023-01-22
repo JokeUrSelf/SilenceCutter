@@ -72,20 +72,28 @@ class UIVerticalScrollBar(UIElement):
 
         self.rebuild_from_changed_theme_data()
 
-        scroll_bar_height = max(5, int(self.scrollable_height * self.visible_percentage))
-        self.sliding_button = UIButton(pygame.Rect((int(self.sliding_rect_position[0]),
-                                                    int(self.sliding_rect_position[1])),
-                                                   (self.background_rect.width,
-                                                    scroll_bar_height)),
-                                       '', self.ui_manager,
-                                       container=self.button_container,
-                                       starting_height=1,
-                                       parent_element=self,
-                                       object_id="#sliding_button",
-                                       anchors={'left': 'left',
-                                                'right': 'right',
-                                                'top': 'top',
-                                                'bottom': 'top'})
+        scroll_bar_height = max(5, int(self.scrollable_height * self.visible_percentage))+1
+
+        self.sliding_button = UIButton(
+            pygame.Rect(
+                int(self.sliding_rect_position[0]),
+                int(self.sliding_rect_position[1]),
+                self.background_rect.width,
+                scroll_bar_height
+            ),
+            '',
+            self.ui_manager,
+            container=self.button_container,
+            starting_height=1,
+            parent_element=self,
+            object_id="#sliding_button",
+            anchors={
+                'left': 'left',
+                'right': 'right',
+                'top': 'top',
+                'bottom': 'top'
+            }
+        )
         self.join_focus_sets(self.sliding_button)
         self.sliding_button.set_hold_range((100, self.background_rect.height))
 
@@ -100,18 +108,20 @@ class UIVerticalScrollBar(UIElement):
 
     def rebuild(self):
         border_and_shadow = self.border_width + self.shadow_width
-        self.background_rect = pygame.Rect((border_and_shadow + self.relative_rect.x,
+        self.background_rect = pygame.Rect((border_and_shadow + self.relative_rect.x ,
                                             border_and_shadow + self.relative_rect.y),
                                            (self.relative_rect.width - (2 * border_and_shadow),
                                             self.relative_rect.height - (2 * border_and_shadow)))
 
-        theming_parameters = {'normal_bg': self.background_colour,
-                              'normal_border': self.border_colour,
-                              'disabled_bg': self.disabled_background_colour,
-                              'disabled_border': self.disabled_border_colour,
-                              'border_width': self.border_width,
-                              'shadow_width': self.shadow_width,
-                              'shape_corner_radius': self.shape_corner_radius}
+        theming_parameters = {
+            'normal_bg': self.background_colour,
+            'normal_border': self.border_colour,
+            'disabled_bg': self.disabled_background_colour,
+            'disabled_border': self.disabled_border_colour,
+            'border_width': self.border_width,
+            'shadow_width': self.shadow_width,
+            'shape_corner_radius': self.shape_corner_radius
+        }
 
         if self.shape == 'rectangle':
             self.drawable_shape = RectDrawableShape(self.rect, theming_parameters,

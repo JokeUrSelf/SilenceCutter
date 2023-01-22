@@ -61,25 +61,20 @@ class Widgets:
     def volume_slider() -> UIVerticalScrollBar:
         rr = relative_rect(
             width=30,
-            height=211,
+            height=211 + 18,
             margin_left=15,
-            margin_top=165
+            margin_top=165 - 10
         )
         slider = UIVerticalScrollBar(
             relative_rect=rr,
-            visible_percentage=0.01,
+            visible_percentage=0.1,
         )
         slider.top_button.kill()
         slider.bottom_button.kill()
 
         return slider
 
-    @staticmethod
-    def export_button() -> pygui.elements.UIButton:
-        return pygui.elements.UIButton(
-            relative_rect=pygame.Rect(15, 450, 105, 30),
-            text="save as..."
-        )
+
 
     @staticmethod
     def export_label() -> pygui.elements.UILabel:

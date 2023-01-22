@@ -8,7 +8,7 @@ a = Analysis(
     ['pygame_window.py'],
     pathex=[],
     binaries=[],
-    datas=[('theme.json','.'),('favicon.ico','.')],
+    datas=[('theme.json','.'),('hqicon.png','.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

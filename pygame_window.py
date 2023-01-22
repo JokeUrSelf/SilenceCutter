@@ -17,7 +17,7 @@ def init():
     pygame.init()
     pygame.display.set_caption('Silence Cutter')
 
-    icon_image = pygame.image.load("favicon.ico")
+    icon_image = pygame.image.load("hqicon.png")
     pygame.display.set_icon(icon_image)
 
     window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), vsync=1)
@@ -61,8 +61,7 @@ def main():
     import_button, import_label = Widgets.import_button(), Widgets.import_label()
     volume_slider, volume_meter = Widgets.volume_slider(), Widgets.volume_meter()
     #
-    export_button, export_label = Widgets.export_button(), Widgets.export_label()
-    export_button.disable()
+    export_label = Widgets.export_label()
     #
     render_button = Widgets.render_button()
     render_button.disable()
@@ -86,7 +85,6 @@ def main():
         if Store.is_mp4():
             format_dropdown.enable()
         import_button.enable()
-        export_button.enable()
         Store.error_list.clear()
 
         progress_chunk_bar.kill()
@@ -104,12 +102,13 @@ def main():
                 sys.exit()
             if event.type == pygui.UI_BUTTON_PRESSED:
                 if event.ui_element == render_button:
+                    get_output_file_path()
+                    export_label.set_text(Store.get_output_file_path())
                     progress_chunk_bar = Widgets.progress_chunk_bar()
                     progress_t_bar = Widgets.progress_t_bar()
                     render_button.disable()
                     format_dropdown.disable()
                     import_button.disable()
-                    export_button.disable()
 
                     blame_bool = True
 
@@ -121,15 +120,9 @@ def main():
                     get_input_file_path()
                     import_label.set_text(Store.get_input_file_path())
                     if Store.get_input_file_path():
-                        export_button.enable()
+                        render_button.enable()
                         if Store.is_mp4():
                             format_dropdown.enable()
-
-                if event.ui_element == export_button:
-                    get_output_file_path()
-                    export_label.set_text(Store.get_output_file_path())
-                    if Store.get_output_directory_path():
-                        render_button.enable()
 
             manager.process_events(event)
 
@@ -148,7 +141,8 @@ def main():
                 progress_t_bar.set_current_progress(Store.get_progress()["t"])
 
         window.fill(color=pygame.Color('#323436'))
-        pygame.draw.rect(window, (59, 52, 54), pygame.Rect(0, 0, 800, 50))
+        if Store.get_error_list_last():
+            pygame.draw.rect(window, (59, 52, 54), pygame.Rect(0, 0, 800, 50))
 
         if Store.volume_range is not volume_range_last:
             volume_range_last = Store.volume_range
