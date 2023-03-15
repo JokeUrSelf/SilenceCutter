@@ -36,7 +36,7 @@ def get_output_file_path():
     root.attributes("-topmost", True)
     root.withdraw()
     file_path: str = filedialog.asksaveasfilename(
-        filetypes=[("Media", ".mp4 .mp3")],
+        filetypes=[("Media", " ".join(Store.supported_formats))],
         initialfile="untitled",
         parent=root,
     )
@@ -50,7 +50,7 @@ def get_input_file_path():
     root = Tk()
     root.attributes("-topmost", True)
     root.withdraw()
-    file_path: str = filedialog.askopenfilename(filetypes=[("Media", ".mp4 .mp3")], parent=root)
+    file_path: str = filedialog.askopenfilename(filetypes=[("Media", " ".join(Store.supported_formats))], parent=root)
     root.destroy()
     pygame.event.set_allowed(None)
     Store.set_input_file_path(file_path)
@@ -60,6 +60,8 @@ def main():
     error_label = Widgets.error_label()
     import_button, import_label = Widgets.import_button(), Widgets.import_label()
     volume_slider, volume_meter = Widgets.volume_slider(), Widgets.volume_meter()
+
+    # volume_slider.sliding_button=500
     #
     export_label = Widgets.export_label()
     #
@@ -74,6 +76,7 @@ def main():
 
     rects = []
     volume_range_last = []
+    buffered_scroll_position: Union[float, None] = None
 
     def render_operation():
         nonlocal progress_t_bar, progress_chunk_bar
@@ -82,7 +85,8 @@ def main():
 
         subprocess.run(f"explorer.exe {path}")
         render_button.enable()
-        if Store.is_mp4():
+        volume_slider.enable()
+        if Store.is_video():
             format_dropdown.enable()
         import_button.enable()
         Store.error_list.clear()
@@ -97,6 +101,27 @@ def main():
     while True:
         time.sleep(1 / FPS)
         for event in pygame.event.get():
+            if event.type == pygui.UI_TEXT_ENTRY_CHANGED:
+                if event.ui_element == volume_meter:
+                    if volume_meter.text:
+                        symbol: str = volume_meter.text[-1]
+                        if symbol not in "123456789.0%":
+                            volume_meter.set_text(volume_meter.text[:-1])
+            if event.type == pygui.UI_TEXT_ENTRY_FINISHED:
+                if event.ui_element == volume_meter:
+                    try:
+                        percentage: float = float(volume_meter.text.removesuffix("%"))
+                    except ValueError:
+                        pass
+                    else:
+                        if 0 > percentage:
+                            percentage = 0
+                        elif percentage > 100:
+                            percentage = 100
+                        cord: float = 200 - percentage * 2
+                        volume_slider.sliding_button.set_relative_position((0, cord))
+                        volume_slider.scroll_position = cord
+
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
@@ -109,6 +134,7 @@ def main():
                     render_button.disable()
                     format_dropdown.disable()
                     import_button.disable()
+                    volume_slider.disable()
 
                     blame_bool = True
 
@@ -121,7 +147,7 @@ def main():
                     import_label.set_text(Store.get_input_file_path())
                     if Store.get_input_file_path():
                         render_button.enable()
-                        if Store.is_mp4():
+                        if Store.is_video():
                             format_dropdown.enable()
 
             manager.process_events(event)
@@ -144,7 +170,7 @@ def main():
         if Store.get_error_list_last():
             pygame.draw.rect(window, (59, 52, 54), pygame.Rect(0, 0, 800, 50))
 
-        if Store.volume_range is not volume_range_last:
+        if volume_range_last != Store.volume_range:
             volume_range_last = Store.volume_range
             rects.clear()
             for i, y in enumerate(Store.volume_range):
@@ -153,9 +179,9 @@ def main():
 
                 rects.append(
                     relative_rect(
-                        width=10,
+                        width=2,
                         height=1 + sample_height,
-                        margin_left=45 + 15 * i,
+                        margin_left=45 + 4 * i,
                         margin_top=290 + 80 - sample_height
                     )
                 )
@@ -168,10 +194,11 @@ def main():
         else:
             for x in rects:
                 pygame.draw.rect(window, (255, 255, 255), x)
-
-        slider_percentage = 100 - volume_slider.scroll_position / 2
-        Store.min_volume = Store.max_possible_volume * slider_percentage / 100
-        volume_meter.set_text(f"{slider_percentage}%")
+        if volume_slider.scroll_position != buffered_scroll_position:
+            buffered_scroll_position = volume_slider.scroll_position
+            slider_percentage: float = 100 - volume_slider.scroll_position / 2
+            Store.min_volume = Store.max_possible_volume * slider_percentage / 100
+            volume_meter.set_text(f"{slider_percentage}%")
         pygame.draw.rect(window, (255, 0, 0), relative_rect(
             width=745,
             height=2,

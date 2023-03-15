@@ -1,7 +1,7 @@
 import pygame_gui as pygui
 import pygame
 from modified_libs.ui_vertical_slider import UIVerticalScrollBar
-
+from data import Store
 
 class Widgets:
 
@@ -15,7 +15,6 @@ class Widgets:
         )
         return pygui.elements.UIProgressBar(
             relative_rect=rr,
-
         )
 
     @staticmethod
@@ -74,15 +73,13 @@ class Widgets:
 
         return slider
 
-
-
     @staticmethod
     def export_label() -> pygui.elements.UILabel:
         rr = relative_rect(
             width=500,
             height=30,
             margin_top=450,
-            margin_left=130
+            margin_left=15
         )
         return pygui.elements.UILabel(
             relative_rect=rr,
@@ -99,22 +96,21 @@ class Widgets:
     @staticmethod
     def format_dropdown() -> pygui.elements.UIDropDownMenu:
         return pygui.elements.UIDropDownMenu(
-            options_list=[".mp4", ".mp3"],
+            options_list=Store.supported_formats,
             relative_rect=pygame.Rect(95, 500, 60, 30),
             starting_option=".mp3"
         )
 
     @staticmethod
-    def volume_meter() -> pygui.elements.UILabel:
+    def volume_meter() -> pygui.elements.UITextEntryLine:
         rr = relative_rect(
-            width=50,
-            height=20,
-            margin_top=400,
+            width=60,
+            height=30,
+            margin_top=390,
             margin_left=15
         )
-        return pygui.elements.UILabel(
-            relative_rect=rr,
-            text="100.0%",
+        return pygui.elements.UITextEntryLine(
+            relative_rect=rr
         )
 
 

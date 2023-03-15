@@ -11,11 +11,12 @@ TITLE = "Silence Cutter"
 # Stores all global variables
 class Store:
     error_list = []
-    volume_range = [0 for _ in range(0, 100, 2)]
+    volume_range = [0 for _ in range(0, 186)]
     min_volume: float = .0
     max_possible_volume: float = .0
     format: str = ".mp3"
     output_file_name: str = "untitled"
+    supported_formats = [".mp3", ".mp4", ".webm"]
 
     _input_file_path: Union[str, None] = None
     _output_directory_path: Union[str, None] = None
@@ -39,7 +40,8 @@ class Store:
     def set_pydub_segment(value: AudioSegment) -> None:
 
         val = [x.max for x in value]
-        Store.volume_range = val[:-50:len(val) // 50]
+
+        Store.volume_range = val[::len(val) // (len(Store.volume_range) - 1)]
         Store._pydub_audio_segment = value
 
     @staticmethod
@@ -98,7 +100,7 @@ class Store:
             Store.error_list_add_item(hint)
 
         try:
-            audio_seg:AudioSegment = AudioSegment.from_file(value)
+            audio_seg: AudioSegment = AudioSegment.from_file(value)
         except:
             Store.error_list_add_item("Error: Couldn't load the file, try checking file format")
             return
@@ -113,12 +115,13 @@ class Store:
         Store._input_file_path = value
 
     @staticmethod
-    def is_mp4() -> bool:
-        return Store.format == ".mp4"
+    def is_video() -> bool:
+        return Store.format in {".mp4", ".webm"}
 
     @staticmethod
     def path_check(path: str) -> bool:
-        return exists(path) and path.endswith(".mp4") or path.endswith(".mp3")
+
+        return exists(path) and path[path.rfind("."):] in Store.supported_formats
 
     @staticmethod
     def get_error_list_last() -> str:

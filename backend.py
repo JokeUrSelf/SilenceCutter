@@ -13,6 +13,7 @@ class MyBarLogger(ProgressBarLogger):
 
 def get_ranges_of_time(min_volume: float) -> list[list[float]]:
     sound: AudioSegment = Store.get_pydub_segment()
+    optimal_range = 100
 
     arr: list[list[float]] = []
     subarr: list[float] = []
@@ -24,7 +25,8 @@ def get_ranges_of_time(min_volume: float) -> list[list[float]]:
             else:
                 subarr = [millisecond, millisecond + 1]
         elif subarr:
-            arr.append(subarr)
+            if subarr[1] - subarr[0] >= optimal_range:
+                arr.append(subarr)
             subarr = []
     if subarr:
         arr.append(subarr)
@@ -42,7 +44,7 @@ def render() -> None:
         Store.error_list_add_item("Error: Couldn't calculate ranges of time")
         return
 
-    if Store.is_mp4():
+    if Store.is_video():
         general_clip: mpe.VideoFileClip = mpe.VideoFileClip(path)
         clips: list = [general_clip.subclip(x[0] / 1000.0, x[1] / 1000.0) for x in sub_arrays]
         video = mpe.concatenate_videoclips(clips)
