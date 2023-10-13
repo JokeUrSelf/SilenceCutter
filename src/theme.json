@@ -1,0 +1,45 @@
+{
+  "label": {
+    "colours": {
+      "dark_bg": "#323436"
+    },
+    "misc": {
+      "text_horiz_alignment": "left"
+    }
+  },
+  "progress_bar": {
+    "colours": {
+      "normal_text": "#FFFFFF",
+      "filled_bar": "#f4251b,#A4150b,180",
+      "unfilled_bar": "#21282d"
+    },
+    "font": {
+      "name": "montserrat",
+      "size": "12",
+      "bold": "0",
+      "italic": "1"
+    },
+    "misc": {
+      "border_width": "0",
+      "shadow_width": "0"
+    }
+  },
+  "text_entry_line": {
+    "misc": {
+      "shadow_width": "0",
+      "padding": "6,4"
+    }
+  },
+  "button": {
+    "misc": {
+      "border_width": "1",
+      "shadow_width": "0",
+      "text_horiz_alignment": "center",
+      "text_vert_alignment": "center",
+      "state_transitions": {
+        "normal_hovered": "0.02",
+        "hovered_normal": "0.02"
+      }
+    }
+  }
+}

@@ -1,6 +1,7 @@
 from typing import Union, Tuple, Dict, Optional
 
 import pygame
+from pygame.event import custom_type
 
 from pygame_gui.core import ObjectID
 from pygame_gui.core.interfaces import IContainerLikeInterface, IUIManagerInterface
@@ -11,6 +12,17 @@ from pygame_gui.elements.ui_button import UIButton
 
 
 class UIVerticalScrollBar(UIElement):
+
+    def set_percentage(self, percentage):
+
+        y_pos: float = (100 - percentage) * 2
+        self.sliding_button.set_relative_position((0, y_pos))
+        self.scroll_position = y_pos
+
+    def get_percentage(self):
+        height = self.bottom_limit - self.sliding_button.relative_rect.height
+        return (height - self.scroll_position) / (height / 100)
+
     def __init__(self,
                  relative_rect: pygame.Rect,
                  visible_percentage: float,
@@ -27,6 +39,7 @@ class UIVerticalScrollBar(UIElement):
                          anchors=anchors,
                          visible=visible)
 
+        self.type: int = custom_type()
         self._create_valid_ids(container=container,
                                parent_element=parent_element,
                                object_id=object_id,
@@ -72,7 +85,7 @@ class UIVerticalScrollBar(UIElement):
 
         self.rebuild_from_changed_theme_data()
 
-        scroll_bar_height = max(5, int(self.scrollable_height * self.visible_percentage))+1
+        scroll_bar_height = max(5, int(self.scrollable_height * self.visible_percentage)) + 1
 
         self.sliding_button = UIButton(
             pygame.Rect(
@@ -108,7 +121,7 @@ class UIVerticalScrollBar(UIElement):
 
     def rebuild(self):
         border_and_shadow = self.border_width + self.shadow_width
-        self.background_rect = pygame.Rect((border_and_shadow + self.relative_rect.x ,
+        self.background_rect = pygame.Rect((border_and_shadow + self.relative_rect.x,
                                             border_and_shadow + self.relative_rect.y),
                                            (self.relative_rect.width - (2 * border_and_shadow),
                                             self.relative_rect.height - (2 * border_and_shadow)))
@@ -118,8 +131,8 @@ class UIVerticalScrollBar(UIElement):
             'normal_border': self.border_colour,
             'disabled_bg': self.disabled_background_colour,
             'disabled_border': self.disabled_border_colour,
-            'border_width': self.border_width,
-            'shadow_width': self.shadow_width,
+            'border_width': 1,
+            'shadow_width': 0,
             'shape_corner_radius': self.shape_corner_radius
         }
 
@@ -287,6 +300,10 @@ class UIVerticalScrollBar(UIElement):
                                             1.0 - self.visible_percentage)
                 if not self.has_moved_recently:
                     self.has_moved_recently = True
+                event_data = {'value': self.scroll_position,
+                              'ui_element': self,
+                              'ui_object_id': self.most_specific_combined_id}
+                pygame.event.post(pygame.event.Event(self.type, event_data))
 
     def set_scroll_from_start_percentage(self, new_start_percentage: float):
         new_start_percentage = min(1.0, max(new_start_percentage, 0.0))
@@ -381,8 +398,8 @@ class UIVerticalScrollBar(UIElement):
             self.rebuild()
 
     def set_position(self, position: Union[pygame.math.Vector2,
-                                           Tuple[int, int],
-                                           Tuple[float, float]]):
+    Tuple[int, int],
+    Tuple[float, float]]):
         super().set_position(position)
 
         border_and_shadow = self.border_width + self.shadow_width
@@ -392,8 +409,8 @@ class UIVerticalScrollBar(UIElement):
         self.button_container.set_relative_position(self.background_rect.topleft)
 
     def set_relative_position(self, position: Union[pygame.math.Vector2,
-                                                    Tuple[int, int],
-                                                    Tuple[float, float]]):
+    Tuple[int, int],
+    Tuple[float, float]]):
         super().set_relative_position(position)
 
         border_and_shadow = self.border_width + self.shadow_width
@@ -403,8 +420,8 @@ class UIVerticalScrollBar(UIElement):
         self.button_container.set_relative_position(self.background_rect.topleft)
 
     def set_dimensions(self, dimensions: Union[pygame.math.Vector2,
-                                               Tuple[int, int],
-                                               Tuple[float, float]]):
+    Tuple[int, int],
+    Tuple[float, float]]):
         super().set_dimensions(dimensions)
 
         border_and_shadow = self.border_width + self.shadow_width

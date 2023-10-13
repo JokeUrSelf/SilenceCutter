@@ -1,8 +1,8 @@
 .idea/
 __pycache__/
-venv/
 ffmpeg.exe
 ffplay.exe
 ffprobe.exe
 build/
 dist/
+venv/
